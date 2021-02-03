@@ -1,0 +1,67 @@
+name: Production workflow
+
+on:
+  push:
+    branches: [master, main]
+
+jobs:
+  build:
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Caching Node Modules and NextJS cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+            **/.cache
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Use Node.js 15.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 15.x
+
+      - name: 🧰 Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
+
+      # - name: 🐛 Run tests and lint
+      #   run: yarn test:prod
+
+      # - name: 🔥 Upload test coverage report
+      #   uses: codecov/codecov-action@v1
+      #   with:
+      #     files: ./coverage/lcov.info
+      #     token: ${{ secrets.CODECOV_TOKEN }} # only necessary for private repo
+
+      - name: 📦 Build app
+        run: yarn build
+
+      - name: Run Semantic Release
+        run: npx semantic-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 💬 Send Message to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              username: 'development-workflow',
+              icon_emoji: ':octocat:',
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `${process.env.AS_WORKFLOW}\n${process.env.AS_JOB}`
+              }]
+            }
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+

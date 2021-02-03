@@ -1,0 +1,8 @@
+node_modules
+dist
+build
+config
+data
+wallaby.js
+tailwind*
+postcss*

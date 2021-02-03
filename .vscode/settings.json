@@ -1,0 +1,25 @@
+{
+  "editor.codeActionsOnSave": [
+    "source.addMissingImports",
+    "source.fixAll.format",
+    "source.fixAll.eslint"
+  ],
+  "workbench.editor.highlightModifiedTabs": true,
+  "search.exclude": {
+    ".git": true,
+    "node_modules": true,
+    "yarn.lock": true,
+    "package-lock.json": true,
+    "coverage": true,
+    "build": true,
+    "docs": true,
+    "CHANGELOG": true,
+    "CODE_OF_CONDUCT": true,
+    "CONTRIBUTING": true,
+    "LICENCE": true
+  },
+  "cSpell.ignorePaths": [
+    "node_modules",
+    ".git",
+  ],
+}
