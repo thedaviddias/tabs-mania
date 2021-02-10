@@ -42,6 +42,11 @@ jobs:
       - name: 📦 Build app
         run: yarn build
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: tabs-mania-extension
+          path: build
+
       - name: Run Semantic Release
         run: npx semantic-release
         env:
